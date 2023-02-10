@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">ConvertToMp3</string>
+    <string name="no_files_here">No files here</string>
+    <string name="mp4_files">Mp4 Files</string>
+    <string name="mp3_files">Mp3 Files</string>
+</resources>
