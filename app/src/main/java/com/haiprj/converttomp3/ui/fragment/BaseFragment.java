@@ -21,12 +21,12 @@ public abstract class BaseFragment<T> extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = (T) DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
         View view = ((ViewDataBinding) binding).getRoot();
-        initView(view);
-        addEvent(view);
+        initView();
+        addEvent();
         return view;
     }
-    protected abstract void initView(View view);
-    protected abstract void addEvent(View view);
+    protected abstract void initView();
+    protected abstract void addEvent();
     protected abstract int getLayoutId();
 
 }

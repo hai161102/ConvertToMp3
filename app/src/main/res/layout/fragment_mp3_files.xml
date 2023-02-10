@@ -42,6 +42,6 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="vertical"
             tools:listitem="@layout/item_file"
-            android:paddingBottom="@dimen/_24sdp"/>
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

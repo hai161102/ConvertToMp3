@@ -1,8 +1,10 @@
 package com.haiprj.converttomp3.ui.activity;
 
+import android.Manifest;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.haiprj.android_app_lib.ui.BaseActivity;
@@ -11,11 +13,13 @@ import com.haiprj.converttomp3.databinding.ActivityMainBinding;
 import com.haiprj.converttomp3.ui.adapter.ViewPagerAdapter;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.ui.fragment.Mp4Fragment;
+import com.haiprj.converttomp3.utils.PermissionUtil;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private final Mp4Fragment mp4Fragment = new Mp4Fragment();
     private final Mp3Fragment mp3Fragment = new Mp3Fragment();
+
 
     private ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {
 
@@ -61,7 +65,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     protected void initView() {
+        //requestPermission();
         setupViewPager();
+    }
+
+    private void requestPermission() {
+        if (PermissionUtil.isPermissionGranted(this, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionUtil.requestPermission(this, 1, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
     }
 
     private void setupViewPager() {
@@ -86,5 +97,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding.viewPager.unregisterOnPageChangeCallback(onPageChangeCallback);
     }
 }
