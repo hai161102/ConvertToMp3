@@ -11,10 +11,12 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 
+import com.haiprj.converttomp3.interfaces.FragmentListener;
+
 public abstract class BaseFragment<T> extends Fragment {
 
     protected T binding;
-
+    protected FragmentListener listener;
     @SuppressWarnings("unchecked")
     @Nullable
     @Override
@@ -29,4 +31,7 @@ public abstract class BaseFragment<T> extends Fragment {
     protected abstract void addEvent();
     protected abstract int getLayoutId();
 
+    public void setListener(FragmentListener listener) {
+        this.listener = listener;
+    }
 }

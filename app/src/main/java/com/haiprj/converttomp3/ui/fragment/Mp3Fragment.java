@@ -23,7 +23,7 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
     private boolean isEmpty = true;
     public static final String TAG = "Mp3Fragment";
     private final List<FileModel> list = new ArrayList<>();
-    private final AppDataPresenter dataPresenter;
+    private AppDataPresenter dataPresenter;
 
     private FileModelAdapter fileModelAdapter;
 
@@ -37,6 +37,11 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
         fileModelAdapter.setListener(new FileModelAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
+
+            }
+
+            @Override
+            public void onMore(int position, Object object, View view) {
 
             }
         });
@@ -72,11 +77,17 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
     @SuppressWarnings("unchecked")
     @Override
     public void onViewAvailable(String key, Object... objects) {
-        if (Objects.equals(key, "loadFile")) {
-            list.clear();
-            list.addAll((Collection<? extends FileModel>) objects[0]);
-            onFileAvailable();
-        }
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (Objects.equals(key, "loadFile")) {
+                    list.clear();
+                    list.addAll((Collection<? extends FileModel>) objects[0]);
+                    onFileAvailable();
+                }
+            }
+        });
     }
 
     private void onFileAvailable() {
@@ -90,7 +101,12 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
 
     @Override
     public void onViewNotAvailable(String mess) {
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        });
     }
 
     @Override

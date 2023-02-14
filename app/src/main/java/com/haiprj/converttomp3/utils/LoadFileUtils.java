@@ -48,10 +48,10 @@ public class LoadFileUtils extends AsyncTask<String, Void, List<FileModel>> {
         if (Objects.equals(strings[0], ".mp4")){
             return getListFileModelVideo();
         }
-        else {
+        else if (Objects.equals(strings[0], ".mp3")) {
             return getListFileModelAudio();
         }
-
+        return null;
     }
     private List<FileModel> getListFileModelAudio() {
         List<FileModel> list = new ArrayList<>();

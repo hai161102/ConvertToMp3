@@ -40,14 +40,21 @@
                 android:src="@drawable/ic_share"
                 app:tint="@color/white" />
         </LinearLayout>
-        <VideoView
+        <FrameLayout
+            android:id="@+id/videoSurfaceContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/videoView"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent">
+            <SurfaceView
+                android:id="@+id/videoSurface"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

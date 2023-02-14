@@ -4,6 +4,7 @@ package com.haiprj.converttomp3.mvp.presenter;
 import android.content.Context;
 
 
+import com.haiprj.android_app_lib.mvp.model.DataModel;
 import com.haiprj.android_app_lib.mvp.presenter.DataPresenter;
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
 import com.haiprj.converttomp3.mvp.model.AppDataModel;
@@ -16,5 +17,9 @@ public class AppDataPresenter extends DataPresenter {
 
     public void loadFile(Context context, String tag) {
         ((AppDataModel)dataModel).loadFile(context, tag);
+    }
+
+    public void convertMp4ToMp3(String srcPath, String dstPath, int startMs, int endMs, boolean useAudio, boolean useVideo) {
+        ((AppDataModel) dataModel).convertMp4ToMp3(srcPath, dstPath, startMs, endMs, useAudio, useVideo);
     }
 }

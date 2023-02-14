@@ -10,6 +10,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.haiprj.android_app_lib.ui.BaseActivity;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.ActivityMainBinding;
+import com.haiprj.converttomp3.interfaces.FragmentListener;
 import com.haiprj.converttomp3.ui.adapter.ViewPagerAdapter;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.ui.fragment.Mp4Fragment;
@@ -19,6 +20,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private final Mp4Fragment mp4Fragment = new Mp4Fragment();
     private final Mp3Fragment mp3Fragment = new Mp3Fragment();
+    private boolean isLoadAudio = false;
 
 
     private ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {
@@ -56,6 +58,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void setViewMp3() {
         binding.mp3Files.setBackgroundResource(R.drawable.shape_search);
         binding.mp3Files.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.app_color)));
+        if (isLoadAudio) {
+            mp3Fragment.loadData();
+            isLoadAudio = false;
+        }
     }
 
     private void setViewMp4() {
@@ -76,12 +82,25 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void setupViewPager() {
+        mp4Fragment.setListener(new FragmentListener() {
+            @Override
+            public void onConvertDone(Object... object) {
+                binding.viewPager.setCurrentItem(1);
+                isLoadAudio = true;
+
+            }
+
+            @Override
+            public void onConvertFailed(String mess) {
+
+            }
+        });
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
         viewPagerAdapter.add(mp4Fragment);
         viewPagerAdapter.add(mp3Fragment);
         binding.viewPager.setAdapter(viewPagerAdapter);
         binding.viewPager.registerOnPageChangeCallback(onPageChangeCallback);
-        binding.viewPager.setUserInputEnabled(true);
+        binding.viewPager.setUserInputEnabled(false);
     }
 
     @Override
@@ -91,6 +110,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         });
         binding.mp3Files.setOnClickListener(v -> {
             binding.viewPager.setCurrentItem(1);
+            isLoadAudio = true;
         });
     }
 

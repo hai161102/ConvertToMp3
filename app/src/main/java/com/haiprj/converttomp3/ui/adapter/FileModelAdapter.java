@@ -80,10 +80,15 @@ public class FileModelAdapter extends RecyclerView.Adapter<FileModelAdapter.View
             binding.itemLayout.setOnClickListener(v -> {
                 listener.onClick(getPosition());
             });
+
+            binding.more.setOnClickListener(v -> {
+                listener.onMore(getPosition(), fileModel, binding.more);
+            });
         }
     }
 
     public interface OnItemClickListener {
         void onClick(int position);
+        void onMore(int position, Object object, View view);
     }
 }

@@ -3,4 +3,11 @@
     <string name="no_files_here">No files here</string>
     <string name="mp4_files">Mp4 Files</string>
     <string name="mp3_files">Mp3 Files</string>
+    <string name="description">Media Controls</string>
+    <string name="share">Share</string>
+    <string name="rename">Rename</string>
+    <string name="details">Detail</string>
+    <string name="convert">Convert</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>
