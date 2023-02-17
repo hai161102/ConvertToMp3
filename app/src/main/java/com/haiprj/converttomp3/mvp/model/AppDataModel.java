@@ -8,6 +8,7 @@ import com.haiprj.android_app_lib.mvp.model.DataResult;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.ui.fragment.Mp4Fragment;
 import com.haiprj.converttomp3.utils.AudioExtractor;
+import com.haiprj.converttomp3.utils.LoadAudio;
 import com.haiprj.converttomp3.utils.LoadFileUtils;
 
 import java.util.ArrayList;
@@ -23,9 +24,8 @@ public class AppDataModel extends DataModel {
 
         String extension = "";
         if (Objects.equals(tag, Mp4Fragment.TAG))
-            extension = ".mp4";
-        else if (Objects.equals(tag, Mp3Fragment.TAG)) extension = ".mp3";
-        new LoadFileUtils(context, dataResult, "loadFile").execute(extension);
+            new LoadFileUtils(context, dataResult, "loadFile").execute();
+        else if (Objects.equals(tag, Mp3Fragment.TAG)) new LoadAudio(context, dataResult, "loadFile").execute();
     }
 
     public void convertMp4ToMp3(String srcPath, String dstPath, int startMs, int endMs, boolean useAudio, boolean useVideo) {

@@ -10,4 +10,5 @@
     <string name="convert">Convert</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="_00_00">00 : 00</string>
 </resources>

@@ -1,16 +1,23 @@
 package com.haiprj.converttomp3.ui.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.FragmentMp3FilesBinding;
-import com.haiprj.converttomp3.models.FileModel;
+import com.haiprj.converttomp3.models.MusicManager;
 import com.haiprj.converttomp3.mvp.presenter.AppDataPresenter;
-import com.haiprj.converttomp3.ui.adapter.FileModelAdapter;
+import com.haiprj.converttomp3.ui.activity.PlayMusicActivity;
+import com.haiprj.converttomp3.ui.adapter.MusicAdapter;
+import com.haiprj.converttomp3.ui.dialog.RenameDialog;
+import com.haiprj.converttomp3.utils.AppUtils;
 import com.haiprj.converttomp3.utils.PermissionUtil;
 
 import java.util.ArrayList;
@@ -22,10 +29,10 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
 
     private boolean isEmpty = true;
     public static final String TAG = "Mp3Fragment";
-    private final List<FileModel> list = new ArrayList<>();
-    private AppDataPresenter dataPresenter;
+    private final List<MusicManager> list = new ArrayList<>();
+    private final AppDataPresenter dataPresenter;
 
-    private FileModelAdapter fileModelAdapter;
+    private MusicAdapter musicAdapter;
 
     public Mp3Fragment() {
         dataPresenter = new AppDataPresenter(this);
@@ -33,19 +40,19 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
 
     @Override
     protected void initView() {
-        fileModelAdapter = new FileModelAdapter(requireContext());
-        fileModelAdapter.setListener(new FileModelAdapter.OnItemClickListener() {
+        musicAdapter = new MusicAdapter(requireContext(), new MusicAdapter.MusicItemListener() {
             @Override
-            public void onClick(int position) {
-
-            }
-
-            @Override
-            public void onMore(int position, Object object, View view) {
-
+            public void callback(String key, Object... objects) {
+                if (Objects.equals(key, MusicAdapter.CLICK_MORE)) {
+                    showMore(objects);
+                }
+                if (Objects.equals(key, MusicAdapter.CLICK)) {
+                    PlayMusicActivity.start(requireContext(), (MusicManager) objects[0]);
+                }
             }
         });
-        binding.rcvFileConvert.setAdapter(fileModelAdapter);
+
+        binding.rcvFileConvert.setAdapter(musicAdapter);
         if (isEmpty) {
             showViewEmpty();
         }
@@ -65,6 +72,52 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
     protected void addEvent() {
 
     }
+    @SuppressLint("NonConstantResourceId")
+    private void showMore(Object[] objects) {
+        MusicManager fileModel = (MusicManager) objects[0];
+        PopupMenu popup = new PopupMenu(requireContext(), (View) objects[1]);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater()
+                .inflate(R.menu.more_popup, popup.getMenu());
+
+        //registering popup with OnMenuItemClickListener
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.share:
+                    AppUtils.shareFile(requireContext(), fileModel.getUri());
+                    break;
+                case R.id.rename:
+                    RenameDialog.getInstance(requireContext(), requireActivity(), (keys, objectsF) -> {
+                        if (Objects.equals(keys, "rename")) {
+                            boolean isSuccess = (boolean) objectsF[0];
+                            if (isSuccess){
+                                loadData();
+                            }
+                            else {
+                                Toast.makeText(requireActivity(), "Error Rename", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }).setFilePath(fileModel.getFileName());
+                    RenameDialog.showUI();
+                    break;
+                case R.id.details:
+                    viewDetails(fileModel.getUri());
+                    break;
+                case R.id.delete:
+                    AppUtils.deleteFile(fileModel.getUri());
+                    break;
+
+            }
+
+            return true;
+        });
+
+        popup.show();
+    }
+
+    private void viewDetails(Uri uri) {
+
+    }
 
     @Override
     protected int getLayoutId() {
@@ -77,15 +130,12 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
     @SuppressWarnings("unchecked")
     @Override
     public void onViewAvailable(String key, Object... objects) {
-        requireActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        requireActivity().runOnUiThread(() -> {
 
-                if (Objects.equals(key, "loadFile")) {
-                    list.clear();
-                    list.addAll((Collection<? extends FileModel>) objects[0]);
-                    onFileAvailable();
-                }
+            if (Objects.equals(key, "loadFile")) {
+                list.clear();
+                list.addAll((Collection<? extends MusicManager>) objects[0]);
+                onFileAvailable();
             }
         });
     }
@@ -96,7 +146,7 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> implement
             showViewEmpty();
         }
         else hideViewEmpty();
-        fileModelAdapter.update(list);
+        musicAdapter.update(list);
     }
 
     @Override

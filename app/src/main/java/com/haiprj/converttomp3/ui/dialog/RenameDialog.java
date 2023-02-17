@@ -16,9 +16,11 @@ import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.DialogRenameBinding;
 import com.haiprj.converttomp3.models.FileModel;
 
+import java.io.File;
+
 public class RenameDialog extends BaseDialog<DialogRenameBinding> {
 
-    private FileModel fileModel;
+    private String filePath;
     @SuppressLint("StaticFieldLeak")
     private static RenameDialog instance;
 
@@ -72,19 +74,17 @@ public class RenameDialog extends BaseDialog<DialogRenameBinding> {
         WindowManager.LayoutParams params = window.getAttributes();
         params.gravity = Gravity.CENTER;
         window.setAttributes(params);
+        binding.editText.setText(new File(filePath).getName().split("\\.")[0]);
     }
 
-    public void setFileModel(FileModel fileModel) {
-        this.fileModel = fileModel;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
 
     }
 
-    private void setupText() {
-        binding.editText.setText(fileModel.getDisplayName());
-    }
+
 
     public static void showUI(){
-        instance.setupText();
         instance.show();
     }
 

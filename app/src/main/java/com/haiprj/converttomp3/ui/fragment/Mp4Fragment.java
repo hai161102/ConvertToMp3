@@ -4,21 +4,16 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
-import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.converttomp3.App;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.FragmentMp4FilesBinding;
@@ -81,7 +76,7 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                                 if (Objects.equals(key, "rename")) {
                                     AppUtils.renameFile(requireContext(), fileModel.getFileUri());
                                 }
-                            }).setFileModel(fileModel);
+                            }).setFilePath(fileModel.getDisplayName());
                             RenameDialog.showUI();
                             break;
                         case R.id.details:
