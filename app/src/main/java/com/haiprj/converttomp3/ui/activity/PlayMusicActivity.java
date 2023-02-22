@@ -21,6 +21,7 @@ import com.haiprj.converttomp3.ui.fragment.ListMusicFragment;
 import com.haiprj.converttomp3.ui.fragment.MediaControlFragment;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.utils.AppUtils;
+import com.haiprj.converttomp3.utils.ReplayState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +34,17 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
 
     private MediaControlFragment mediaControlFragment;
     private ListMusicFragment listMusicFragment;
-    private List<FileModel> currentListFile = new ArrayList<>();
-    private FragmentLyric fragmentLyric = new FragmentLyric();
+    private final List<FileModel> currentListFile = new ArrayList<>();
+    private final FragmentLyric fragmentLyric = new FragmentLyric();
 
     public List<FileModel> randomList = new ArrayList<>();
 
     private boolean isRandom = false;
+
+    public boolean isRandom() {
+        return isRandom;
+    }
+
     private String json = "";
     private final ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {
 
@@ -113,16 +119,38 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
         listMusicFragment = new ListMusicFragment(isRandom ? randomList : currentListFile);
         mediaControlFragment.setCallback((action, objects) -> {
             if (Objects.equals(action, "next")){
-                FileModel fileModel = (FileModel) objects[0];
-                int i = listMusicFragment.getList().indexOf(fileModel);
-                if (i < listMusicFragment.getList().size() - 1) {
-                    mediaControlFragment.loadData(listMusicFragment.getList().get(i + 1));
+                if (objects.length == 1) {
+                    FileModel fileModel = (FileModel) objects[0];
+                    int i = listMusicFragment.getList().indexOf(fileModel);
+                    if (i < listMusicFragment.getList().size() - 1) {
+                        mediaControlFragment.loadData(listMusicFragment.getList().get(i + 1));
 
+                    }
+                    else {
+                        mediaControlFragment.loadData(listMusicFragment.getList().get(0));
+                    }
+                    setCurrentFileModel(fileModel);
                 }
-                else {
-                    mediaControlFragment.loadData(listMusicFragment.getList().get(0));
+                if (objects.length == 2) {
+                    FileModel fileModel = (FileModel) objects[0];
+                    ReplayState replayState = (ReplayState) objects[1];
+                    int i = listMusicFragment.getList().indexOf(fileModel);
+                    switch (replayState) {
+                        case NONE:
+                            if (i == listMusicFragment.getList().size() - 1)
+                                break;
+                        case REPLAY_ALL:
+                            if (i < listMusicFragment.getList().size() - 1) {
+                                mediaControlFragment.loadData(listMusicFragment.getList().get(i + 1));
+
+                            }
+                            else {
+                                mediaControlFragment.loadData(listMusicFragment.getList().get(0));
+                            }
+                            break;
+                    }
+                    setCurrentFileModel(fileModel);
                 }
-                setCurrentFileModel(fileModel);
             }
 
             if (Objects.equals(action, "previous")) {
@@ -139,6 +167,17 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
             }
             if (Objects.equals(action, "finish")){
                 PlayMusicActivity.this.finish();
+            }
+            if (Objects.equals(action, "random")){
+                isRandom = !isRandom;
+                if (isRandom) {
+                    setupRandomList();
+                }
+                else {
+                    randomList.clear();
+                    randomList.addAll(currentListFile);
+                }
+                listMusicFragment.updateList(randomList);
             }
         });
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);

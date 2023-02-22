@@ -14,7 +14,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_oval"
+                android:background="@drawable/shape_bg_text"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_10sdp"
                 android:text="@string/random"
@@ -23,7 +23,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:id="@+id/random"/>
         </LinearLayout>
-        <FrameLayout
+        <androidx.fragment.app.FragmentContainerView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintTop_toBottomOf="@id/tool"

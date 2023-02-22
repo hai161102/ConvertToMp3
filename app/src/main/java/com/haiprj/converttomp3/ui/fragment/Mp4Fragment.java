@@ -2,6 +2,8 @@ package com.haiprj.converttomp3.ui.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
@@ -12,8 +14,14 @@ import android.view.View;
 import android.widget.Toast;
 
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
 
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
 import com.haiprj.android_app_lib.ui.BaseDialog;
@@ -29,6 +37,7 @@ import com.haiprj.converttomp3.ui.dialog.DetailsDialog;
 import com.haiprj.converttomp3.ui.dialog.RenameDialog;
 import com.haiprj.converttomp3.utils.AppUtils;
 import com.haiprj.converttomp3.utils.FilePath;
+import com.haiprj.converttomp3.utils.FileUtils;
 import com.haiprj.converttomp3.utils.PermissionUtil;
 
 import java.io.File;
@@ -40,6 +49,16 @@ import java.util.Objects;
 public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implements ViewResult {
 
     private boolean isEmpty = true;
+
+    private boolean isPermissionGranted;
+
+    public void setPermissionGranted(boolean permissionGranted) {
+        isPermissionGranted = permissionGranted;
+        if (getContext() != null) {
+            loadData();
+        }
+    }
+
     public static final String TAG = "Mp4Fragment";
     private final List<FileModel> list = new ArrayList<>();
     private final AppDataPresenter dataPresenter;
@@ -109,8 +128,6 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
             showViewEmpty();
         }
         loadData();
-
-
     }
 
     private void viewDetails(FileModel fileModel) {
@@ -124,18 +141,22 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
     }
 
     private void convertFile(Uri fileUri) {
-        MediaPlayer mp = MediaPlayer.create(requireContext(), fileUri);
-        int duration = mp.getDuration();
-        mp.release();
-        @SuppressWarnings("ConstantConditions") File file = new File(FilePath.getPath(requireContext(), fileUri));
+//        MediaPlayer mp = MediaPlayer.create(requireContext(), fileUri);
+//        int duration = mp.getDuration();
+//        mp.release();
+        //@SuppressWarnings("ConstantConditions") File file = new File(FilePath.getPath(requireContext(), fileUri));
         binding.frameProgress.setVisibility(View.VISIBLE);
-        dataPresenter.convertMp4ToMp3(file.getPath(),
-                App.getAppPath(requireContext()) + File.separator + file.getName().split(".mp4")[0] + ".mp3",
-                0,
-                duration,
-                true,
-                true);
-
+//        dataPresenter.convertMp4ToMp3(file.getPath(),
+//                App.getAppPath(requireContext()) + File.separator + file.getName().split(".mp4")[0] + ".mp3",
+//                0,
+//                duration,
+//                true,
+//                true);
+        try {
+            dataPresenter.convertMp4ToMp3(requireContext(), FileUtils.getFileFromUri(requireContext(), fileUri).getAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -175,6 +196,12 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                     binding.frameProgress.setVisibility(View.GONE);
 
                 }
+                if (Objects.equals(key, Const.MVP_CONVERT)) {
+                    if (listener != null)
+                        listener.onConvertDone(objects[0]);
+                    binding.frameProgress.setVisibility(View.GONE);
+                }
+
             }
         });
 
@@ -186,7 +213,6 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
             showViewEmpty();
         }
         else hideViewEmpty();
-        Log.d(Mp4Fragment.TAG, "onFileAvailable Fragment: " + list.size());
         fileModelAdapter.update(list);
 //        Log.d(TAG, "onFileAvailable: " + list.size());
     }
@@ -212,8 +238,10 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
 
     }
 
+
     public void loadData() {
-        dataPresenter.loadFile(requireContext(),Const.LOAD_MP4);
+        if (isPermissionGranted)
+            dataPresenter.loadFile(requireContext(),Const.LOAD_MP4);
     }
 
 }

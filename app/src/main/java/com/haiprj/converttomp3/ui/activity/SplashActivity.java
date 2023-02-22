@@ -11,6 +11,7 @@ import com.haiprj.converttomp3.databinding.ActivitySplashBinding;
 import com.haiprj.converttomp3.models.FileModel;
 import com.haiprj.converttomp3.mvp.presenter.AppDataPresenter;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
+import com.haiprj.converttomp3.utils.SharePreferenceUtils;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -20,6 +21,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
 
     @Override
     protected void initView() {
+        SharePreferenceUtils.getInstance().init(this);
         new Handler().postDelayed(() -> {
             MainActivity.start(SplashActivity.this);
             finish();

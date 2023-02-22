@@ -23,7 +23,7 @@ import java.util.Objects;
 public class App extends Application {
 
     private static String appPath;
-    public static final List<FileModel> list = new ArrayList<>();
+    public static boolean isPermissionGranted = false;
     public static AppRoomDatabase getAppRoomDatabase(Context context) {
         return AppRoomDatabase.getInstance(context);
     }
@@ -35,7 +35,7 @@ public class App extends Application {
     public static String getAppPath(Context context) {
         String path;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_AUDIOBOOKS) + File.separator + context.getString(R.string.app_name);
+            path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + File.separator + context.getString(R.string.app_name);
         }
         else {
             path = Environment.getExternalStorageDirectory() + File.separator + context.getString(R.string.app_name);

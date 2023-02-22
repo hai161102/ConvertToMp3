@@ -7,6 +7,9 @@ import android.content.pm.PackageManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PermissionUtil {
     public static boolean isPermissionGranted(Context context, String... permissions){
 
@@ -18,8 +21,12 @@ public class PermissionUtil {
         return true;
     }
 
-    public static void requestPermission(Activity activity, int requestCode, String... permissions) {
-
+    public static void requestPermission(Activity activity, Context context, int requestCode, OnPermissionResult onPermissionResult, String... permissions) {
         activity.requestPermissions(permissions, requestCode);
+    }
+
+    public interface OnPermissionResult{
+        void onGranted();
+        void onDenied(String... permissions);
     }
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
+import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.converttomp3.App;
 import com.haiprj.converttomp3.AppCallback;
 import com.haiprj.converttomp3.Const;
@@ -22,6 +24,7 @@ import com.haiprj.converttomp3.mvp.presenter.AppDataPresenter;
 import com.haiprj.converttomp3.ui.activity.MainActivity;
 import com.haiprj.converttomp3.ui.activity.PlayMusicActivity;
 import com.haiprj.converttomp3.ui.adapter.MusicAdapter;
+import com.haiprj.converttomp3.ui.dialog.DetailsDialog;
 import com.haiprj.converttomp3.ui.dialog.RenameDialog;
 import com.haiprj.converttomp3.utils.AppUtils;
 import com.haiprj.converttomp3.utils.PermissionUtil;
@@ -30,17 +33,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> implements ViewResult {
 
-    private List<FileModel> listMp3 = new ArrayList<>();
+    private final List<FileModel> listMp3 = new ArrayList<>();
     private AppDataPresenter dataPresenter;
     private Mp3Fragment mp3Fragment;
+
     @Override
     protected void initView() {
         dataPresenter = new AppDataPresenter(this);
-        loadData();
         mp3Fragment = new Mp3Fragment(listMp3);
+        FragmentTransaction ft = requireActivity().getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.mp3View, mp3Fragment).commit();
+        loadData();
         mp3Fragment.setCallback((action, objects) -> {
             if (Objects.equals(action, MusicAdapter.CLICK_MORE)) {
                 showMore(objects);
@@ -59,14 +66,20 @@ public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> i
 //                    });
             }
         });
-        assert getFragmentManager() != null;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.mp3View, mp3Fragment).commit();
+
     }
 
     @Override
     protected void addEvent() {
-
+        binding.random.setOnClickListener(v -> {
+            List<String> listJson = new ArrayList<>();
+            Random random = new Random();
+            int index = random.nextInt(listMp3.size());
+            listMp3.forEach(fileModel -> {
+                listJson.add(AppUtils.convertToJson(fileModel));
+            });
+            PlayMusicActivity.start(requireContext(), AppUtils.convertToJson(listMp3.get(index)), listJson, true);
+        });
     }
 
     @Override
@@ -89,21 +102,7 @@ public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> i
     @Override
     public void onViewNotAvailable(String mess) {
         requireActivity().runOnUiThread(() -> {
-            if (Objects.equals(mess, Const.PERMISSION_NOT_GRANTED)) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                    if (!PermissionUtil.isPermissionGranted(requireContext(), Manifest.permission.MANAGE_EXTERNAL_STORAGE)) {
-                        PermissionUtil.requestPermission(requireActivity(), Const.REQUEST_MANAGE_STORAGE_ID, Manifest.permission.MANAGE_EXTERNAL_STORAGE);
-                    }
-                }
-                else {
-                    if (!PermissionUtil.isPermissionGranted(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)){
-                        PermissionUtil.requestPermission(requireActivity(), Const.REQUEST_MANAGE_STORAGE_ID, Manifest.permission.READ_EXTERNAL_STORAGE);
-                    }
-                    else if (!PermissionUtil.isPermissionGranted(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                        PermissionUtil.requestPermission(requireActivity(), Const.REQUEST_MANAGE_STORAGE_ID, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                    }
-                }
-            }
+
         });
     }
 
@@ -154,28 +153,21 @@ public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> i
     }
 
     private void viewDetails(FileModel fileModel) {
+        DetailsDialog detailsDialog = new DetailsDialog(requireContext(), requireActivity(), (key, objects) -> {
 
+        }, fileModel);
+        detailsDialog.show();
     }
 
-    private void loadData() {
-        dataPresenter.loadFile(requireContext(), Const.LOAD_MP3);
+    public void loadData() {
+        if (isPermissionGranted)
+            dataPresenter.loadFile(requireContext(), Const.LOAD_MP3);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Const.REQUEST_MANAGE_STORAGE_ID) {
 
-            // Checking whether user granted the permission or not.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    private boolean isPermissionGranted;
 
-                // Showing the toast message
-                Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
+    public void setPermissionGranted(boolean permissionGranted) {
+        isPermissionGranted = permissionGranted;
     }
-
 }

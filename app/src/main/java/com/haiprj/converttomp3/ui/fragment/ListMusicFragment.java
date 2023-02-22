@@ -21,11 +21,17 @@ public class ListMusicFragment extends BaseFragment<FragmentListMusicBinding>{
     private Mp3Fragment fragmentList;
     private Mp3Fragment fragmentFavourite;
 
-    private List<FileModel> currentList = new ArrayList<>();
+    private final List<FileModel> currentList = new ArrayList<>();
     public ListMusicFragment(List<FileModel> list) {
-        this.currentList = list;
+        this.currentList.clear();
+        this.currentList.addAll(list);
     }
 
+    public void updateList(List<FileModel> list) {
+        this.currentList.clear();
+        this.currentList.addAll(list);
+        fragmentList.updateList(this.currentList);
+    }
     private AppCallback callback;
     private final ViewPager2.OnPageChangeCallback pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
         /**

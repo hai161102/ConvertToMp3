@@ -4,6 +4,7 @@ package com.haiprj.converttomp3.ui.fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,13 +32,14 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> {
     private boolean isEmpty = true;
     public static final String TAG = "Mp3Fragment";
 
-    private List<FileModel> list = new ArrayList<>();
+    private final List<FileModel> list = new ArrayList<>();
     private MusicAdapter musicAdapter;
 
     private AppCallback callback;
 
     public Mp3Fragment(List<FileModel> list) {
-        this.list = list;
+        this.list.clear();
+        this.list.addAll(list);
     }
 
 
@@ -89,12 +91,12 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> {
 
     private void setupFile(List<FileModel> fileModelList) {
         isEmpty = fileModelList.isEmpty();
+        musicAdapter.update(fileModelList);
         try {
             if (isEmpty) {
                 showViewEmpty();
             }
             else hideViewEmpty();
-            musicAdapter.update(fileModelList);
         }catch (Exception ignored) {
 
         }
@@ -117,6 +119,5 @@ public class Mp3Fragment extends BaseFragment<FragmentMp3FilesBinding> {
         this.list.clear();
         this.list.addAll(listMp3);
         setupFile(this.list);
-        this.notify();
     }
 }

@@ -53,7 +53,7 @@ public class LoadAudio extends AsyncTask<String, Void, List<FileModel>> {
         String[] selectionArgs = new String[] {
                 String.valueOf(TimeUnit.MILLISECONDS.convert(0, TimeUnit.MINUTES))
         };
-        String sortOrder = MediaStore.Audio.Media.DISPLAY_NAME + " ASC";
+        String sortOrder = MediaStore.Audio.Media.DISPLAY_NAME + " DESC";
 
         try (Cursor cursor = context.getApplicationContext().getContentResolver().query(
                 collection,
