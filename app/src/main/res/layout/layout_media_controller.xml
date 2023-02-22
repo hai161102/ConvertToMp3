@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_media_controller"
+        android:background="@color/black">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_8sdp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="vertical">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_4sdp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/_10sdp"
+                    android:textColor="@color/white"
+                    android:text="@string/_00_00"
+                    android:fontFamily="@font/poppins_regular"
+                    android:id="@+id/currentTime"
+                    app:layout_constraintTop_toBottomOf="@id/timeSeekBar"
+                    app:layout_constraintStart_toStartOf="@id/timeSeekBar"/>
+                <SeekBar
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:layout_weight="1"
+                    android:id="@+id/timeSeekBar"
+                    android:progressBackgroundTint="@color/app_color"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginVertical="@dimen/_4sdp"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/_10sdp"
+                    android:textColor="@color/white"
+                    android:text="@string/_00_00"
+                    android:fontFamily="@font/poppins_regular"
+                    android:id="@+id/duration"
+                    app:layout_constraintTop_toBottomOf="@id/timeSeekBar"
+                    app:layout_constraintEnd_toEndOf="@id/timeSeekBar"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_4sdp"
+                android:weightSum="7"
+                android:gravity="center_vertical"
+                android:layout_marginVertical="@dimen/_4sdp"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:id="@+id/randomMusic"
+                    android:layout_weight="1"
+                    android:src="@drawable/random_music"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:id="@+id/previous"
+                    android:src="@drawable/ic_previous"
+                    android:padding="@dimen/_2sdp"
+                    android:layout_weight="1"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:id="@+id/rewind"
+                    android:src="@drawable/baseline_fast_rewind_24"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_24sdp"
+                    android:id="@+id/play"
+                    android:src="@drawable/ic_play"
+                    android:layout_weight="1"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_weight="1"
+                    android:id="@+id/forward"
+                    android:src="@drawable/baseline_fast_forward_24"
+                    app:tint="@color/white" />
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:id="@+id/next"
+                    android:src="@drawable/ic_next"
+                    android:padding="@dimen/_2sdp"
+                    android:layout_weight="1"
+                    app:tint="@color/white" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:id="@+id/repeatMusic"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_repeat_24"
+                    app:tint="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

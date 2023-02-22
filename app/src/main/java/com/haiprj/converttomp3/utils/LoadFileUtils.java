@@ -1,31 +1,25 @@
 package com.haiprj.converttomp3.utils;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Size;
-import android.webkit.MimeTypeMap;
 
 import androidx.annotation.RequiresApi;
 
 import com.haiprj.android_app_lib.mvp.model.DataResult;
+import com.haiprj.converttomp3.Const;
 import com.haiprj.converttomp3.models.FileModel;
 import com.haiprj.converttomp3.ui.fragment.Mp4Fragment;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("deprecation")
@@ -45,7 +39,6 @@ public class LoadFileUtils extends AsyncTask<String, Void, List<FileModel>> {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected List<FileModel> doInBackground(String... strings) {
-
         return getListFileModelVideo();
     }
 
@@ -100,7 +93,7 @@ public class LoadFileUtils extends AsyncTask<String, Void, List<FileModel>> {
 
                 // Stores column values and the contentUri in a local object
                 // that represents the media file.
-                fileModels.add(new FileModel(name,contentUri, duration, size));
+                fileModels.add(new FileModel(name,contentUri.toString(), duration, size));
             }
         }
         return fileModels;
@@ -109,6 +102,10 @@ public class LoadFileUtils extends AsyncTask<String, Void, List<FileModel>> {
     @Override
     protected void onPostExecute(List<FileModel> fileModels) {
         super.onPostExecute(fileModels);
+        if (fileModels == null) {
+            dataResult.onDataResultFailed(Const.PERMISSION_NOT_GRANTED);
+            return;
+        }
         Log.d(Mp4Fragment.TAG, "onFileAvailable: " + fileModels.size());
         dataResult.onDataResultSuccess(key, fileModels);
     }

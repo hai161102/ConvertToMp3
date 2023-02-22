@@ -5,7 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,8 +13,8 @@ import com.bumptech.glide.Glide;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.ItemFileBinding;
 import com.haiprj.converttomp3.models.FileModel;
+import com.haiprj.converttomp3.utils.AppUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public class FileModelAdapter extends RecyclerView.Adapter<FileModelAdapter.View
             float size = fileModel.getSize() / (1024f * 1024f);
             binding.fileName.setText(fileModel.getDisplayName());
 
-            binding.fileSize.setText(String.format("%.2f", size) + "Mb");
+            binding.fileSize.setText(AppUtils.stringForTime(fileModel.getDuration()));
             if (fileModel.getDisplayName().endsWith(".mp4")) {
                 Glide.with(context).load(fileModel.getFileUri()).into(binding.imgItem);
             }

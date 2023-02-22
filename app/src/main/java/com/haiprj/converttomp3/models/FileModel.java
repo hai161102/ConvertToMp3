@@ -2,26 +2,27 @@ package com.haiprj.converttomp3.models;
 
 import android.net.Uri;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "file_model")
 public class FileModel {
+    @PrimaryKey(autoGenerate = true)
+    public int id;
     private String displayName;
-    private Uri fileUri;
+    private String fileUriPath;
 
     private int duration;
     private int size;
 
-    public FileModel(String displayName, Uri fileUri) {
-        this.displayName = displayName;
-        this.fileUri = fileUri;
+    public FileModel() {
     }
 
-    public FileModel(String displayName, Uri fileUri, int duration, int size) {
+    public FileModel(String displayName, String fileUriPath, int duration, int size) {
         this.displayName = displayName;
-        this.fileUri = fileUri;
+        this.fileUriPath = fileUriPath;
         this.duration = duration;
         this.size = size;
-    }
-
-    public FileModel() {
     }
 
     public String getDisplayName() {
@@ -32,12 +33,12 @@ public class FileModel {
         this.displayName = displayName;
     }
 
-    public Uri getFileUri() {
-        return fileUri;
+    public String getFileUriPath() {
+        return fileUriPath;
     }
 
-    public void setFileUri(Uri fileUri) {
-        this.fileUri = fileUri;
+    public void setFileUriPath(String fileUriPath) {
+        this.fileUriPath = fileUriPath;
     }
 
     public int getDuration() {
@@ -54,5 +55,9 @@ public class FileModel {
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public Uri getFileUri() {
+        return Uri.parse(fileUriPath);
     }
 }

@@ -3,12 +3,14 @@ package com.haiprj.converttomp3.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.media.MediaController2;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -19,20 +21,19 @@ import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.ActivityWatchBinding;
 import com.haiprj.converttomp3.utils.AppUtils;
 import com.haiprj.converttomp3.utils.FilePath;
-import com.haiprj.converttomp3.widget.VideoControllerView;
 
 import java.io.File;
 import java.io.IOException;
 
-public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> implements SurfaceHolder.Callback,
+public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> implements
         MediaPlayer.OnPreparedListener,
-        VideoControllerView.MediaPlayerControl
+        MediaController.MediaPlayerControl
 {
     private String uriPath = "";
     private Uri videoUri;
 
-    private MediaPlayer player;
-    private VideoControllerView controller;
+    private MediaController controller;
+
     public static void start(Context context, String uriPath) {
         Intent starter = new Intent(context, WatchVideoActivity.class);
         starter.putExtra("path", uriPath);
@@ -43,22 +44,13 @@ public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> imple
     protected void initView() {
         uriPath = getIntent().getStringExtra("path");
         videoUri = Uri.parse(uriPath);
+        //noinspection ConstantConditions
+        File file = new File(FilePath.getPath(this, videoUri));
+        controller = new MediaController(this);
+        binding.videoSurface.setVideoURI(videoUri);
+        binding.videoSurface.setOnPreparedListener(this);
+        binding.fileName.setText(file.getName().split("\\.")[0]);
 
-        SurfaceHolder videoHolder = binding.videoSurface.getHolder();
-        videoHolder.setFixedSize(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        videoHolder.addCallback(this);
-
-        player = new MediaPlayer();
-        controller = new VideoControllerView(this);
-
-        try {
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            player.setDataSource(this, videoUri);
-            player.setOnPreparedListener(this);
-        } catch (IllegalArgumentException | SecurityException | IllegalStateException |
-                 IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -81,7 +73,9 @@ public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> imple
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        controller.show();
+        if (!controller.isShowing())
+            controller.show(0);
+        else controller.hide();
         return false;
     }
 
@@ -94,53 +88,38 @@ public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> imple
     public void onPrepared(MediaPlayer mp) {
         controller.setMediaPlayer(this);
         controller.setAnchorView(binding.videoSurfaceContainer);
-        player.start();
+        binding.videoSurface.start();
     }
 
-    @Override
-    public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        player.setDisplay(holder);
-        player.prepareAsync();
-    }
-
-    @Override
-    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-
-    }
 
     @Override
     public void start() {
-        player.start();
+        binding.videoSurface.start();
     }
 
     @Override
     public void pause() {
-        player.pause();
+        binding.videoSurface.pause();
     }
 
     @Override
     public int getDuration() {
-        return player.getDuration();
+        return binding.videoSurface.getDuration();
     }
 
     @Override
     public int getCurrentPosition() {
-        return player.getCurrentPosition();
+        return binding.videoSurface.getCurrentPosition();
     }
 
     @Override
     public void seekTo(int pos) {
-        player.seekTo(pos);
+        binding.videoSurface.seekTo(pos);
     }
 
     @Override
     public boolean isPlaying() {
-        return player.isPlaying();
+        return binding.videoSurface.isPlaying();
     }
 
     @Override
@@ -163,25 +142,27 @@ public class WatchVideoActivity extends BaseActivity<ActivityWatchBinding> imple
         return true;
     }
 
+    /**
+     * Get the audio session id for the player used by this VideoView. This can be used to
+     * apply audio effects to the audio track of a video.
+     *
+     * @return The audio session, or 0 if there was an error.
+     */
     @Override
-    public boolean isFullScreen() {
-        return false;
+    public int getAudioSessionId() {
+        return binding.videoSurface.getAudioSessionId();
     }
 
-    @Override
-    public void toggleFullScreen() {
-
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        player.stop();
+        //binding.videoSurface.stop();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        player.pause();
+        binding.videoSurface.pause();
     }
 }

@@ -2,9 +2,11 @@ package com.haiprj.converttomp3.ui.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -14,13 +16,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
+import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.converttomp3.App;
+import com.haiprj.converttomp3.Const;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.FragmentMp4FilesBinding;
 import com.haiprj.converttomp3.models.FileModel;
 import com.haiprj.converttomp3.mvp.presenter.AppDataPresenter;
 import com.haiprj.converttomp3.ui.activity.WatchVideoActivity;
 import com.haiprj.converttomp3.ui.adapter.FileModelAdapter;
+import com.haiprj.converttomp3.ui.dialog.DetailsDialog;
 import com.haiprj.converttomp3.ui.dialog.RenameDialog;
 import com.haiprj.converttomp3.utils.AppUtils;
 import com.haiprj.converttomp3.utils.FilePath;
@@ -79,8 +84,10 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                             }).setFilePath(fileModel.getDisplayName());
                             RenameDialog.showUI();
                             break;
+                        case R.id.addFavourite:
+                            break;
                         case R.id.details:
-                            viewDetails(fileModel.getFileUri());
+                            viewDetails(fileModel);
                             break;
                         case R.id.delete:
                             AppUtils.deleteFile(fileModel.getFileUri());
@@ -101,16 +108,19 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
         if (isEmpty) {
             showViewEmpty();
         }
-        if (PermissionUtil.isPermissionGranted(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            loadData();
-        }
-        else {
-            PermissionUtil.requestPermission(requireActivity(), 1, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
+        loadData();
+
+
     }
 
-    private void viewDetails(Uri fileUri) {
+    private void viewDetails(FileModel fileModel) {
+        DetailsDialog detailsDialog = new DetailsDialog(requireContext(), requireActivity(), new BaseDialog.OnActionDialogCallback() {
+            @Override
+            public void callback(String key, Object... objects) {
 
+            }
+        }, fileModel);
+        detailsDialog.show();
     }
 
     private void convertFile(Uri fileUri) {
@@ -131,10 +141,6 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
     @Override
     public void onResume() {
         super.onResume();
-        if (!PermissionUtil.isPermissionGranted(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            PermissionUtil.requestPermission(requireActivity(), 1, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        }
     }
 
     private void showViewEmpty() {
@@ -194,6 +200,9 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
         requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (Objects.equals(mess, Const.PERMISSION_NOT_GRANTED)) {
+
+                }
                 if (listener != null)
                     listener.onConvertFailed(mess);
                 Toast.makeText(requireContext(), mess, Toast.LENGTH_LONG).show();
@@ -204,17 +213,7 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
     }
 
     public void loadData() {
-        dataPresenter.loadFile(requireContext(),TAG);
+        dataPresenter.loadFile(requireContext(),Const.LOAD_MP4);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1){
-            if (PermissionUtil.isPermissionGranted(requireContext(), permissions)){
-                loadData();
-            }
-            else PermissionUtil.requestPermission(requireActivity(), 1, permissions);
-        }
-    }
 }

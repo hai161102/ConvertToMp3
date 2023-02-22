@@ -1,5 +1,6 @@
 package com.haiprj.converttomp3.utils;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
@@ -10,13 +11,14 @@ import android.os.Build;
 import android.provider.MediaStore;
 
 import com.haiprj.android_app_lib.mvp.model.DataResult;
-import com.haiprj.converttomp3.models.MusicManager;
+import com.haiprj.converttomp3.Const;
+import com.haiprj.converttomp3.models.FileModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class LoadAudio extends AsyncTask<String, Void, List<MusicManager>> {
+public class LoadAudio extends AsyncTask<String, Void, List<FileModel>> {
     @SuppressLint("StaticFieldLeak")
     private final Context context;
     private final DataResult dataResult;
@@ -28,12 +30,12 @@ public class LoadAudio extends AsyncTask<String, Void, List<MusicManager>> {
         this.key = key;
     }
     @Override
-    protected List<MusicManager> doInBackground(String... strings) {
+    protected List<FileModel> doInBackground(String... strings) {
         return getListFileModelAudio();
     }
 
-    private List<MusicManager> getListFileModelAudio() {
-        List<MusicManager> list = new ArrayList<>();
+    private List<FileModel> getListFileModelAudio() {
+        List<FileModel> list = new ArrayList<>();
         Uri collection;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             collection = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
@@ -80,15 +82,19 @@ public class LoadAudio extends AsyncTask<String, Void, List<MusicManager>> {
 
                 // Stores column values and the contentUri in a local object
                 // that represents the media file.
-                list.add(new MusicManager(name,contentUri, size, duration));
+                list.add(new FileModel(name,contentUri.toString(), duration, size));
             }
         }
         return list;
     }
 
     @Override
-    protected void onPostExecute(List<MusicManager> musicManagers) {
-        super.onPostExecute(musicManagers);
-        dataResult.onDataResultSuccess(key, musicManagers);
+    protected void onPostExecute(List<FileModel> fileModels) {
+        super.onPostExecute(fileModels);
+        if (fileModels == null) {
+            dataResult.onDataResultFailed(Const.PERMISSION_NOT_GRANTED);
+            return;
+        }
+        dataResult.onDataResultSuccess(key, fileModels);
     }
 }

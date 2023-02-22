@@ -1,6 +1,5 @@
 package com.haiprj.converttomp3.ui.adapter;
 
-import static com.haiprj.converttomp3.utils.AppUtils.convertDuration;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.ItemMusicBinding;
-import com.haiprj.converttomp3.models.MusicManager;
+import com.haiprj.converttomp3.models.FileModel;
+import com.haiprj.converttomp3.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     public static final String CLICK = "click";
     private Context context;
     private MusicItemListener listener;
-    private final List<MusicManager> list = new ArrayList<>();
+    private final List<FileModel> list = new ArrayList<>();
 
     public MusicAdapter(Context context, MusicItemListener listener) {
         this.context = context;
@@ -33,10 +33,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     }
 
 
-    public void update(List<MusicManager> list) {
+    public void update(List<FileModel> list) {
         this.list.clear();
         this.list.addAll(list);
         notifyDataSetChanged();
+    }
+
+    public List<FileModel> getList() {
+        return list;
     }
     @NonNull
     @Override
@@ -61,15 +65,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
             binding = DataBindingUtil.bind(itemView);
         }
 
-        public void load(MusicManager musicManager) {
-            binding.musicName.setText(musicManager.getFileName());
+        public void load(FileModel fileModel) {
+            binding.musicName.setText(fileModel.getDisplayName());
 
-            binding.musicDuration.setText(convertDuration(musicManager.getDuration()));
+            binding.musicDuration.setText(AppUtils.stringForTime(fileModel.getDuration()));
             binding.musicMore.setOnClickListener(v -> {
-                listener.callback(CLICK_MORE, musicManager, binding.musicMore);
+                listener.callback(CLICK_MORE, fileModel, binding.musicMore);
             });
             binding.getRoot().setOnClickListener(v -> {
-                listener.callback(CLICK, musicManager);
+                listener.callback(CLICK, fileModel);
             });
         }
 

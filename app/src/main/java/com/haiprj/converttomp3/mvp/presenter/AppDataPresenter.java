@@ -22,4 +22,8 @@ public class AppDataPresenter extends DataPresenter {
     public void convertMp4ToMp3(String srcPath, String dstPath, int startMs, int endMs, boolean useAudio, boolean useVideo) {
         ((AppDataModel) dataModel).convertMp4ToMp3(srcPath, dstPath, startMs, endMs, useAudio, useVideo);
     }
+
+    public void loadFavouriteMp3(Context requireContext) {
+        ((AppDataModel) dataModel).loadFavouriteMp3(requireContext);
+    }
 }

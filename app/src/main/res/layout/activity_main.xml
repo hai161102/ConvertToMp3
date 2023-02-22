@@ -25,9 +25,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/app_name"
-                    android:textSize="@dimen/_24sdp"
+                    android:textSize="@dimen/_20sdp"
                     android:textColor="@color/white"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/poppins_semibold"
                     />
                 <ImageView
                     android:layout_width="@dimen/_24sdp"
@@ -58,10 +58,12 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@android:color/transparent"
-                        android:textSize="@dimen/_14sdp"
+                        android:textSize="@dimen/_12sdp"
                         android:textColor="@color/color_38"
                         android:id="@+id/edt_search"
-                        android:fontFamily="@font/roboto_regular"
+                        android:singleLine="true"
+                        android:hint="@string/search_here"
+                        android:fontFamily="@font/poppins_regular"
                         android:textCursorDrawable="@color/app_color"
                         android:paddingHorizontal="@dimen/_5sdp"/>
                     <ImageView
@@ -98,14 +100,14 @@
                 <ImageView
                     android:layout_width="@dimen/_16sdp"
                     android:layout_height="@dimen/_16sdp"
-                    android:src="@drawable/icons8_video_file_24"
+                    android:src="@drawable/baseline_video_file_24"
                     app:tint="@color/white" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mp4_files"
                     android:textColor="@color/white"
-                    android:fontFamily="@font/roboto_regular"
+                    android:fontFamily="@font/poppins_medium"
                     android:textSize="@dimen/_10sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
             </LinearLayout>
@@ -120,14 +122,14 @@
                 <ImageView
                     android:layout_width="@dimen/_16sdp"
                     android:layout_height="@dimen/_16sdp"
-                    android:src="@mipmap/icons8_playlist_32_mdpi"
+                    android:src="@drawable/baseline_queue_music_24"
                     app:tint="@color/white" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mp3_files"
                     android:textColor="@color/white"
-                    android:fontFamily="@font/roboto_regular"
+                    android:fontFamily="@font/poppins_medium"
                     android:textSize="@dimen/_10sdp"
                     android:layout_marginTop="@dimen/_4sdp"/>
             </LinearLayout>

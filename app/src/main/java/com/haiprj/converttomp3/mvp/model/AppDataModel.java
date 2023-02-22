@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.haiprj.android_app_lib.mvp.model.DataModel;
 import com.haiprj.android_app_lib.mvp.model.DataResult;
+import com.haiprj.converttomp3.App;
+import com.haiprj.converttomp3.Const;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.ui.fragment.Mp4Fragment;
 import com.haiprj.converttomp3.utils.AudioExtractor;
@@ -23,12 +25,16 @@ public class AppDataModel extends DataModel {
     public void loadFile(Context context, String tag) {
 
         String extension = "";
-        if (Objects.equals(tag, Mp4Fragment.TAG))
+        if (Objects.equals(tag, Const.LOAD_MP4))
             new LoadFileUtils(context, dataResult, "loadFile").execute();
-        else if (Objects.equals(tag, Mp3Fragment.TAG)) new LoadAudio(context, dataResult, "loadFile").execute();
+        else if (Objects.equals(tag, Const.LOAD_MP3)) new LoadAudio(context, dataResult, "loadFile").execute();
     }
 
     public void convertMp4ToMp3(String srcPath, String dstPath, int startMs, int endMs, boolean useAudio, boolean useVideo) {
         AudioExtractor.genVideoUsingMuxer(srcPath, dstPath, startMs, endMs, useAudio, useVideo, dataResult);
+    }
+
+    public void loadFavouriteMp3(Context requireContext) {
+        dataResult.onDataResultSuccess("loadFavouriteMp3", App.getAppRoomDatabase(requireContext).favouriteDao().getAllFavourite());
     }
 }

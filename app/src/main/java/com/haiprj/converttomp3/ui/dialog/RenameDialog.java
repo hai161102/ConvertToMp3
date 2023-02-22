@@ -14,7 +14,6 @@ import androidx.annotation.Nullable;
 import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.DialogRenameBinding;
-import com.haiprj.converttomp3.models.FileModel;
 
 import java.io.File;
 

@@ -45,4 +45,10 @@ dependencies {
     implementation 'com.github.hai161102:AndroidAppLib:1.0.2'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+
+    var room_version = "2.5.0"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    implementation 'com.google.code.gson:gson:2.9.0'
 }

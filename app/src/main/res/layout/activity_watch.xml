@@ -3,6 +3,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -19,6 +20,7 @@
                 android:layout_height="@dimen/_24sdp"
                 android:src="@drawable/icon_back"
                 android:layout_marginEnd="@dimen/_12sdp"
+                android:padding="@dimen/_4sdp"
                 android:id="@+id/backImage"
                 app:tint="@color/white" />
             <TextView
@@ -28,14 +30,14 @@
                 android:text="@string/app_name"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:fontFamily="@font/roboto_regular"
+                android:fontFamily="@font/poppins_regular"
                 android:textSize="@dimen/_12sdp"
                 android:textColor="@color/white"/>
             <ImageView
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:padding="@dimen/_2sdp"
+                android:padding="@dimen/_4sdp"
                 android:id="@+id/share"
                 android:src="@drawable/ic_share"
                 app:tint="@color/white" />
@@ -43,14 +45,15 @@
         <FrameLayout
             android:id="@+id/videoSurfaceContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-            <SurfaceView
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="@dimen/_2sdp">
+            <VideoView
                 android:id="@+id/videoSurface"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
         </FrameLayout>
