@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -84,24 +85,13 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
             @Override
             public void onMore(int position, Object object, View view) {
                 FileModel fileModel = (FileModel) object;
-                PopupMenu popup = new PopupMenu(requireContext(), view);
-                //Inflating the Popup using xml file
-                popup.getMenuInflater()
-                        .inflate(R.menu.more_popup, popup.getMenu());
-
-                //registering popup with OnMenuItemClickListener
-                popup.setOnMenuItemClickListener(item -> {
-                    switch (item.getItemId()) {
+                AppUtils.showPopupMenu(requireContext(), R.menu.more_popup, view, menuItem -> {
+                    switch (menuItem.getItemId()) {
                         case R.id.share:
                             AppUtils.shareFile(requireContext(), fileModel.getFileUri());
                             break;
                         case R.id.rename:
-                            RenameDialog.getInstance(requireContext(), requireActivity(), (key, objects) -> {
-                                if (Objects.equals(key, "rename")) {
-                                    AppUtils.renameFile(requireContext(), fileModel.getFileUri());
-                                }
-                            }).setFilePath(fileModel.getDisplayName());
-                            RenameDialog.showUI();
+                            AppUtils.rename(requireContext(), requireActivity(), FileUtils.getFileFromUri(requireContext(), fileModel.getFileUri()).getAbsolutePath(), dataPresenter);
                             break;
                         case R.id.addFavourite:
                             break;
@@ -109,18 +99,15 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                             viewDetails(fileModel);
                             break;
                         case R.id.delete:
-                            AppUtils.deleteFile(fileModel.getFileUri());
+                            AppUtils.delete(requireContext(), requireActivity(), FilePath.getPath(requireContext(), fileModel.getFileUri()), dataPresenter);
+//                            AppUtils.deleteFile(fileModel.getFileUri());
                             break;
                         case R.id.convert:
                             convertFile(fileModel.getFileUri());
-                            popup.dismiss();
                             break;
 
                     }
-                    return true;
                 });
-
-                popup.show();
             }
         });
         binding.rcvFileConvert.setAdapter(fileModelAdapter);
@@ -201,7 +188,12 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                         listener.onConvertDone(objects[0]);
                     binding.frameProgress.setVisibility(View.GONE);
                 }
-
+                if (Objects.equals(key, Const.DELETE)) {
+                    dataPresenter.loadFile(requireContext(), Const.LOAD_MP4);
+                }
+                if (Objects.equals(key, Const.RENAME)) {
+                    loadData();
+                }
             }
         });
 
@@ -231,6 +223,7 @@ public class Mp4Fragment extends BaseFragment<FragmentMp4FilesBinding> implement
                 }
                 if (listener != null)
                     listener.onConvertFailed(mess);
+
                 Toast.makeText(requireContext(), mess, Toast.LENGTH_LONG).show();
                 binding.frameProgress.setVisibility(View.GONE);
             }

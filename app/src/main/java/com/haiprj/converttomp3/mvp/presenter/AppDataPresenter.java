@@ -4,7 +4,6 @@ package com.haiprj.converttomp3.mvp.presenter;
 import android.content.Context;
 
 
-import com.haiprj.android_app_lib.mvp.model.DataModel;
 import com.haiprj.android_app_lib.mvp.presenter.DataPresenter;
 import com.haiprj.android_app_lib.mvp.view.ViewResult;
 import com.haiprj.converttomp3.mvp.model.AppDataModel;
@@ -27,5 +26,20 @@ public class AppDataPresenter extends DataPresenter {
     }
     public void loadFavouriteMp3(Context requireContext) {
         ((AppDataModel) dataModel).loadFavouriteMp3(requireContext);
+    }
+
+    public void rename(Context context, String filePath, String newName) {
+        ((AppDataModel) dataModel).rename(context, filePath, newName);
+    }
+
+    public void delete(Context context, String filePath) {
+        ((AppDataModel) dataModel).delete(context, filePath);
+    }
+
+    @Override
+    public void onDataResultFailed(String mess) {
+
+        super.onDataResultFailed(mess);
+
     }
 }

@@ -17,4 +17,5 @@
     <string name="favourite">Favourite</string>
     <string name="done">Done</string>
     <string name="random">Random Play</string>
+    <string name="are_you_sure_want_to_delete_this_file">Are you sure want to delete this file?</string>
 </resources>

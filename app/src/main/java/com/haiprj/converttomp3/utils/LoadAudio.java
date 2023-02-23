@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -31,6 +32,13 @@ public class LoadAudio extends AsyncTask<String, Void, List<FileModel>> {
     }
     @Override
     protected List<FileModel> doInBackground(String... strings) {
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_STARTED));
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_FINISHED));
         return getListFileModelAudio();
     }
 

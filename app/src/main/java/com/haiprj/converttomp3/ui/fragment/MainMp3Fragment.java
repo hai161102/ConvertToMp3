@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,8 +28,11 @@ import com.haiprj.converttomp3.ui.adapter.MusicAdapter;
 import com.haiprj.converttomp3.ui.dialog.DetailsDialog;
 import com.haiprj.converttomp3.ui.dialog.RenameDialog;
 import com.haiprj.converttomp3.utils.AppUtils;
+import com.haiprj.converttomp3.utils.FilePath;
+import com.haiprj.converttomp3.utils.FileUtils;
 import com.haiprj.converttomp3.utils.PermissionUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -96,43 +100,34 @@ public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> i
                 listMp3.addAll((Collection<? extends FileModel>) objects[0]);
                 mp3Fragment.updateList(listMp3);
             }
+            if (Objects.equals(key, Const.RENAME)) {
+                loadData();
+            }
+            if (Objects.equals(key, Const.DELETE)) {
+                loadData();
+            }
         });
     }
 
     @Override
     public void onViewNotAvailable(String mess) {
         requireActivity().runOnUiThread(() -> {
-
+            Toast.makeText(requireContext(), mess, Toast.LENGTH_LONG).show();
         });
     }
 
     @SuppressLint("NonConstantResourceId")
     private void showMore(Object[] objects) {
         FileModel fileModel = (FileModel) objects[0];
-        PopupMenu popup = new PopupMenu(requireContext(), (View) objects[1]);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater()
-                .inflate(R.menu.more_popup, popup.getMenu());
 
-        //registering popup with OnMenuItemClickListener
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
+        AppUtils.showPopupMenu(requireContext(), R.menu.more_popup, (View) objects[1], menuItem -> {
+            switch (menuItem.getItemId()) {
                 case R.id.share:
                     AppUtils.shareFile(requireContext(), fileModel.getFileUri());
                     break;
                 case R.id.rename:
-                    RenameDialog.getInstance(requireContext(), requireActivity(), (keys, objectsF) -> {
-                        if (Objects.equals(keys, "rename")) {
-                            boolean isSuccess = (boolean) objectsF[0];
-                            if (isSuccess){
-                                loadData();
-                            }
-                            else {
-                                Toast.makeText(requireContext(), "Error Rename", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }).setFilePath(fileModel.getDisplayName());
-                    RenameDialog.showUI();
+                    File file = FileUtils.getFileFromUri(requireContext(), fileModel.getFileUri());
+                    AppUtils.rename(requireContext(), requireActivity(), file.getPath(), dataPresenter);
                     break;
                 case R.id.addFavourite:
                     App.getAppRoomDatabase(requireContext()).favouriteDao().insert(fileModel);
@@ -141,15 +136,13 @@ public class MainMp3Fragment extends BaseFragment<FragmentMainMp3FilesBinding> i
                     viewDetails(fileModel);
                     break;
                 case R.id.delete:
-                    AppUtils.deleteFile(fileModel.getFileUri());
+                    AppUtils.delete(requireContext(), requireActivity(), FilePath.getPath(requireContext(), fileModel.getFileUri()), dataPresenter);
+//                    AppUtils.deleteFile(fileModel.getFileUri());
                     break;
 
             }
-
-            return true;
         });
 
-        popup.show();
     }
 
     private void viewDetails(FileModel fileModel) {

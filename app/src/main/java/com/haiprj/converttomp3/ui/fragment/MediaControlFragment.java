@@ -24,12 +24,21 @@ import java.io.IOException;
 
 public class MediaControlFragment extends BaseFragment<FragmentMusicEditBarBinding> {
 
+    public static final String NEXT_AND_NONE = "NEXT_AND_NONE";
+    public static final String NEXT_AND_REPLAY_ALL = "NEXT_AND_REPLAY_ALL";
+    public static final String NEXT_AND_REPLAY_ONE = "NEXT_AND_REPLAY_ONE";
     private MediaPlayer mediaPlayer;
     private FileModel fileModel;
 
     private AppCallback callback;
 
     private ReplayState replayState;
+
+
+    public ReplayState getReplayState() {
+        return replayState;
+    }
+
     public MediaControlFragment(FileModel FileModel) {
         this.fileModel = FileModel;
     }
@@ -72,24 +81,36 @@ public class MediaControlFragment extends BaseFragment<FragmentMusicEditBarBindi
         mediaPlayer.setOnCompletionListener(mp -> {
             binding.timeLine.setComplete();
             binding.mediaController.play.setImageResource(R.drawable.ic_play);
-            switch (replayState) {
-                case NONE:
-                case REPLAY_ALL:
-                    onNext();
-                    break;
-                case REPLAY_ONE:
-                    mediaPlayer.start();
-            }
+            //onAutoNext();
+//            switch (replayState) {
+//                case NONE:
+//                case REPLAY_ALL:
+//                    onNext();
+//                    break;
+//                case REPLAY_ONE:
+//                    mediaPlayer.start();
+//                    break;
+//            }
         });
         reload();
         setupViewRandom();
 
 
+
     }
 
-    private void onNext(ReplayState replayState) {
-        callback.action("next", fileModel, replayState);
+    private void onAutoNext() {
+        if (replayState == ReplayState.NONE) {
+            callback.action(NEXT_AND_NONE, fileModel);
+        }
+        else if (replayState == ReplayState.REPLAY_ALL) {
+            callback.action(NEXT_AND_REPLAY_ALL, fileModel);
+        }
+        else if (replayState == ReplayState.REPLAY_ONE) {
+            callback.action(NEXT_AND_REPLAY_ONE, fileModel);
+        }
     }
+
 
     private void setupViewReplay() {
         switch (replayState) {
@@ -140,6 +161,7 @@ public class MediaControlFragment extends BaseFragment<FragmentMusicEditBarBindi
 
         binding.mediaController.randomMusic.setOnClickListener(v -> {
             callback.action("random");
+
             setupViewRandom();
         });
 
@@ -155,6 +177,7 @@ public class MediaControlFragment extends BaseFragment<FragmentMusicEditBarBindi
                     replayState = ReplayState.NONE;
                     break;
             }
+            SharePreferenceUtils.getInstance().setInt(Const.REPLAY_STATE_CURRENT, replayState.ordinal());
             setupViewReplay();
         });
         binding.mediaController.play.setOnClickListener(v -> {

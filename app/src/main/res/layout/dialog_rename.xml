@@ -10,7 +10,7 @@
             android:background="@drawable/shape_search"
             android:padding="@dimen/_12sdp"
             android:gravity="center"
-            android:layout_marginHorizontal="@dimen/_24sdp"
+            android:layout_marginHorizontal="@dimen/_12sdp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/_4sdp"
                 android:text="@string/rename"
-                android:textSize="@dimen/_16sdp"
+                android:textSize="@dimen/_12sdp"
                 android:textColor="@color/color_38"
                 android:gravity="center"
                 android:fontFamily="@font/poppins_semibold"
@@ -35,7 +35,7 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/_4sdp"
                     android:text="@string/rename"
-                    android:textSize="@dimen/_16sdp"
+                    android:textSize="@dimen/_10sdp"
                     android:textColor="@color/color_38"
                     android:fontFamily="@font/poppins_regular"
                     android:backgroundTint="@color/app_color"
@@ -72,6 +72,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:textColor="@color/color_38"
                     android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:textSize="@dimen/_10sdp"
                     android:id="@+id/cancel"/>
                 <TextView
                     android:layout_width="0dp"
@@ -85,6 +86,7 @@
                     android:fontFamily="@font/poppins_medium"
                     android:textColor="@color/white"
                     android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:textSize="@dimen/_10sdp"
                     android:id="@+id/done"/>
             </LinearLayout>
 

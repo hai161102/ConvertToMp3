@@ -3,32 +3,43 @@ package com.haiprj.converttomp3.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 
 
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.haiprj.android_app_lib.mvp.view.ViewResult;
 import com.haiprj.android_app_lib.ui.BaseActivity;
+import com.haiprj.android_app_lib.ui.BaseDialog;
 import com.haiprj.converttomp3.App;
 import com.haiprj.converttomp3.AppCallback;
+import com.haiprj.converttomp3.Const;
 import com.haiprj.converttomp3.R;
 import com.haiprj.converttomp3.databinding.ActivityPlayMusicBinding;
 import com.haiprj.converttomp3.models.FileModel;
+import com.haiprj.converttomp3.mvp.presenter.AppDataPresenter;
 import com.haiprj.converttomp3.ui.adapter.MusicAdapter;
 import com.haiprj.converttomp3.ui.adapter.ViewPagerAdapter;
+import com.haiprj.converttomp3.ui.dialog.DetailsDialog;
 import com.haiprj.converttomp3.ui.fragment.FragmentLyric;
 import com.haiprj.converttomp3.ui.fragment.ListMusicFragment;
 import com.haiprj.converttomp3.ui.fragment.MediaControlFragment;
 import com.haiprj.converttomp3.ui.fragment.Mp3Fragment;
 import com.haiprj.converttomp3.utils.AppUtils;
+import com.haiprj.converttomp3.utils.FilePath;
+import com.haiprj.converttomp3.utils.FileUtils;
 import com.haiprj.converttomp3.utils.ReplayState;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
-public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
+public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> implements ViewResult {
 
     private FileModel fileModel;
 
@@ -40,6 +51,7 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
     public List<FileModel> randomList = new ArrayList<>();
 
     private boolean isRandom = false;
+    private AppDataPresenter dataPresenter;
 
     public boolean isRandom() {
         return isRandom;
@@ -78,9 +90,11 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
         starter.putStringArrayListExtra("list", (ArrayList<String>) listJson);
         context.startActivity(starter);
     }
+
     @SuppressLint("CheckResult")
     @Override
     protected void initView() {
+        dataPresenter = new AppDataPresenter(this);
         random = new Random();
         isRandom = getIntent().getBooleanExtra("random", false);
         json = getIntent().getStringExtra("object");
@@ -105,75 +119,63 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
     }
 
 
-    private void randomMusic(final List<FileModel> list, final List<FileModel> randomLists){
+    private void randomMusic(final List<FileModel> list, final List<FileModel> randomLists) {
         int index = random.nextInt(list.size());
-        if (randomLists.contains(list.get(index))){
+        if (randomLists.contains(list.get(index))) {
             randomMusic(list, randomLists);
-        }
-        else {
+        } else {
             randomLists.add(list.get(index));
         }
     }
+
     private void setupViewPager() {
         mediaControlFragment = new MediaControlFragment(getCurrentFileModel());
         listMusicFragment = new ListMusicFragment(isRandom ? randomList : currentListFile);
         mediaControlFragment.setCallback((action, objects) -> {
-            if (Objects.equals(action, "next")){
-                if (objects.length == 1) {
-                    FileModel fileModel = (FileModel) objects[0];
-                    int i = listMusicFragment.getList().indexOf(fileModel);
-                    if (i < listMusicFragment.getList().size() - 1) {
-                        mediaControlFragment.loadData(listMusicFragment.getList().get(i + 1));
 
-                    }
-                    else {
-                        mediaControlFragment.loadData(listMusicFragment.getList().get(0));
-                    }
-                    setCurrentFileModel(fileModel);
-                }
-                if (objects.length == 2) {
-                    FileModel fileModel = (FileModel) objects[0];
-                    ReplayState replayState = (ReplayState) objects[1];
-                    int i = listMusicFragment.getList().indexOf(fileModel);
-                    switch (replayState) {
-                        case NONE:
-                            if (i == listMusicFragment.getList().size() - 1)
-                                break;
-                        case REPLAY_ALL:
-                            if (i < listMusicFragment.getList().size() - 1) {
-                                mediaControlFragment.loadData(listMusicFragment.getList().get(i + 1));
+            if (Objects.equals(action, "next")) {
+                FileModel model = (FileModel) objects[0];
 
-                            }
-                            else {
-                                mediaControlFragment.loadData(listMusicFragment.getList().get(0));
-                            }
-                            break;
-                    }
-                    setCurrentFileModel(fileModel);
-                }
+                mediaControlFragment.loadData(getNextMusic(model));
+                setCurrentFileModel(getNextMusic(model));
             }
 
-            if (Objects.equals(action, "previous")) {
-                FileModel fileModel = (FileModel) objects[0];
-                int i = listMusicFragment.getList().indexOf(fileModel);
-                if (i > 0) {
-                    mediaControlFragment.loadData(listMusicFragment.getList().get(i - 1));
+            else if (Objects.equals(action, MediaControlFragment.NEXT_AND_NONE)) {
+                FileModel model = (FileModel) objects[0];
+                if (listMusicFragment.getList().indexOf(model) >= listMusicFragment.getList().size() - 1) {
+                    return;
                 }
-                else
-                {
-                    mediaControlFragment.loadData(listMusicFragment.getList().get(listMusicFragment.getList().size() - 1));
-                }
-                setCurrentFileModel(fileModel);
+                mediaControlFragment.loadData(getNextMusic(model));
+                setCurrentFileModel(getNextMusic(model));
             }
-            if (Objects.equals(action, "finish")){
+
+            else if (Objects.equals(action, MediaControlFragment.NEXT_AND_REPLAY_ALL)) {
+                FileModel model = (FileModel) objects[0];
+
+                mediaControlFragment.loadData(getNextMusic(model));
+                setCurrentFileModel(getNextMusic(model));
+            }
+
+            else if (Objects.equals(action, MediaControlFragment.NEXT_AND_REPLAY_ONE)) {
+                FileModel model = (FileModel) objects[0];
+                mediaControlFragment.loadData(model);
+                setCurrentFileModel(model);
+            }
+
+            else if (Objects.equals(action, "previous")) {
+                FileModel model = (FileModel) objects[0];
+
+                mediaControlFragment.loadData(getPreviousMusic(model));
+                setCurrentFileModel(getPreviousMusic(model));
+            }
+            else if (Objects.equals(action, "finish")) {
                 PlayMusicActivity.this.finish();
             }
-            if (Objects.equals(action, "random")){
+            else if (Objects.equals(action, "random")) {
                 isRandom = !isRandom;
                 if (isRandom) {
                     setupRandomList();
-                }
-                else {
+                } else {
                     randomList.clear();
                     randomList.addAll(currentListFile);
                 }
@@ -182,6 +184,7 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
         });
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(this);
         listMusicFragment.setCallback(new AppCallback() {
+            @SuppressLint("NonConstantResourceId")
             @Override
             public void action(String action, Object... objects) {
                 if (Objects.equals(action, MusicAdapter.CLICK)) {
@@ -192,6 +195,29 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
 
                 if (Objects.equals(action, MusicAdapter.CLICK_MORE)) {
 
+                    FileModel model = (FileModel) objects[0];
+                    AppUtils.showPopupMenu((Context) PlayMusicActivity.this, R.menu.more_popup, (View) objects[1], menuItem -> {
+                        switch (menuItem.getItemId()) {
+                            case R.id.share:
+                                AppUtils.shareFile(PlayMusicActivity.this, model.getFileUri());
+                                break;
+                            case R.id.rename:
+                                File file = FileUtils.getFileFromUri(PlayMusicActivity.this, model.getFileUri());
+                                AppUtils.rename(PlayMusicActivity.this, PlayMusicActivity.this, file.getPath(), dataPresenter);
+                                break;
+                            case R.id.addFavourite:
+                                App.getAppRoomDatabase(PlayMusicActivity.this).favouriteDao().insert(model);
+                                break;
+                            case R.id.details:
+                                viewDetails(model);
+                                break;
+                            case R.id.delete:
+                                AppUtils.delete(PlayMusicActivity.this, PlayMusicActivity.this, FilePath.getPath(PlayMusicActivity.this, model.getFileUri()), dataPresenter);
+//                                AppUtils.deleteFile(fileModel.getFileUri());
+                                break;
+
+                        }
+                    });
                 }
 
 
@@ -206,6 +232,30 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
         binding.viewPager.setCurrentItem(1);
     }
 
+    private FileModel getNextMusic(FileModel current){
+        if (listMusicFragment.getList().indexOf(current) < listMusicFragment.getList().size() - 1)
+            return listMusicFragment.getList().get(listMusicFragment.getList().indexOf(current) + 1);
+        else
+            return listMusicFragment.getList().get(0);
+    }
+
+    private FileModel getPreviousMusic(FileModel current) {
+        if (listMusicFragment.getList().indexOf(current) > 0)
+            return listMusicFragment.getList().get(listMusicFragment.getList().indexOf(current) - 1);
+        else
+            return listMusicFragment.getList().get(listMusicFragment.getList().size() - 1);
+    }
+
+    private void viewDetails(FileModel fileModel) {
+        DetailsDialog detailsDialog = new DetailsDialog(this, this, new BaseDialog.OnActionDialogCallback() {
+            @Override
+            public void callback(String key, Object... objects) {
+
+            }
+        }, fileModel);
+        detailsDialog.show();
+    }
+
     private FileModel getCurrentFileModel() {
         return fileModel;
     }
@@ -213,14 +263,12 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
     private void setCurrentFileModel(FileModel model) {
         fileModel = model;
     }
+
     @Override
     protected void addEvent() {
 
 
-
-
     }
-
 
 
     @Override
@@ -243,5 +291,32 @@ public class PlayMusicActivity extends BaseActivity<ActivityPlayMusicBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_play_music;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onViewAvailable(String key, Object... objects) {
+        if (Objects.equals(key, "loadFile")) {
+            currentListFile.clear();
+            currentListFile.addAll((Collection<? extends FileModel>) objects[0]);
+            if (isRandom) {
+                setupRandomList();
+            } else {
+                randomList.clear();
+                randomList.addAll(currentListFile);
+            }
+            listMusicFragment.updateList(randomList);
+        }
+        if (Objects.equals(key, Const.RENAME)) {
+            dataPresenter.loadFile(this, Const.LOAD_MP3);
+        }
+        if (Objects.equals(key, Const.DELETE)) {
+            dataPresenter.loadFile(this, Const.LOAD_MP3);
+        }
+    }
+
+    @Override
+    public void onViewNotAvailable(String mess) {
+
     }
 }

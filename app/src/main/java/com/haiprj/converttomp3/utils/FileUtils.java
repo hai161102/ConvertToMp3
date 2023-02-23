@@ -10,6 +10,9 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 public class FileUtils {
 
@@ -19,7 +22,7 @@ public class FileUtils {
 	// @param context The context.
 	// @param uri	 The Uri to query
 	@SuppressLint("Range")
-	public static File getFileFromUri(final Context context, final Uri uri) throws Exception {
+	public static File getFileFromUri(final Context context, final Uri uri){
 
 		String path = null;
 
@@ -117,5 +120,18 @@ public class FileUtils {
 	// @return Whether the Uri authority is MediaProvider.
 	public static boolean isMediaDocument(Uri uri) {
 		return "com.android.providers.media.documents".equals(uri.getAuthority());
+	}
+
+	@SuppressWarnings("resource")
+	public static void copyFile(File src, File dst)
+	{
+		try {
+			try (FileChannel inChannel = new FileInputStream(src).getChannel(); FileChannel outChannel = new FileOutputStream(dst).getChannel()) {
+				inChannel.transferTo(0, inChannel.size(), outChannel);
+			}
+		}catch (Exception ignored) {
+
+		}
+
 	}
 }
